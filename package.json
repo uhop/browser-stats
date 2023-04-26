@@ -1,0 +1,25 @@
+{
+  "name": "browser-stats",
+  "version": "1.0.0",
+  "description": "Calculating a feature set using GA reports.",
+  "private": "true",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [],
+  "author": "Eugene Lazutkin <eugene.lazutkin@gmail.com> (http://lazutkin.com/)",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "caniuse-lite": "^1.0.30001481",
+    "stream-csv-as-json": "^1.0.4"
+  },
+  "homepage": "http://github.com/uhop/browser-stats",
+  "bugs": "http://github.com/uhop/browser-stats/issues",
+  "github": "http://github.com/uhop/browser-stats",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/uhop/browser-stats.git"
+  }
+}
