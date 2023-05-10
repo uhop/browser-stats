@@ -97,6 +97,16 @@ const listBrowserFrameClasses = (from, to) => {
   return results;
 };
 
+export const stringify = version =>
+  version.major +
+  '.' +
+  version.minor +
+  '.' +
+  version.patch +
+  (version.build ? '.' + version.build : '') +
+  (version.prerelease ? '-' + prerelease : '') +
+  (version.buildMeta ? '+' + buildMeta : '');
+
 const makeBrowserTable = (root, data) => {
   const featureFrames = calcFeatureFrames(data);
 
@@ -105,7 +115,7 @@ const makeBrowserTable = (root, data) => {
 
   let currentBrowserIndex = 0;
   table.innerHTML =
-    '<thead><tr><th class="right">#</th><th>Original browser name</th><th>Original browser version</th><th>Browser</th><th>Version</th><th class="right">Users</th></tr></thead><tbody>' +
+    '<thead><tr><th class="right">#</th><th>Browser</th><th>Version</th><th class="right">Users</th></tr></thead><tbody>' +
     data.frames
       .map((frame, index) =>
         frame.browsers
@@ -113,13 +123,9 @@ const makeBrowserTable = (root, data) => {
             item =>
               `<tr class="browser-item ${listBrowserFrameClasses(index, data.frames.length).join(
                 ' '
-              )}"><td class="right">${formatInteger(++currentBrowserIndex)}</td><td>${
-                item.originalBrowserName
-              }</td><td>${item.originalBrowserVersion}</td><td>${item.browser}</td><td>${item.version.major}.${
-                item.version.minor
-              }.${item.version.patch}.${item.version.build}</td><td class="right">${formatInteger(
-                item.users
-              )}</td></tr>`
+              )}"><td class="right">${formatInteger(++currentBrowserIndex)}</td><td>${item.browser}</td><td>${stringify(
+                item.version
+              )}</td><td class="right">${formatInteger(item.users)}</td></tr>`
           )
           .join('')
       )

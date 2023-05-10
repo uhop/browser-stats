@@ -64,6 +64,16 @@ export const parse = (s, defaultValue = 0) => {
   return version;
 };
 
+export const stringify = version =>
+  version.major +
+  '.' +
+  version.minor +
+  '.' +
+  version.patch +
+  (version.build ? '.' + version.build : '') +
+  (version.prerelease ? '-' + prerelease : '') +
+  (version.buildMeta ? '+' + buildMeta : '');
+
 export const compare = (a, b, defaultValue = 0) => {
   if (typeof a == 'string') {
     a = parse(a, defaultValue);

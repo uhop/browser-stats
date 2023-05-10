@@ -6,7 +6,7 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/index.js --cluster minor --input data/raw.csv",
     "debug": "node --inspect-brk src/index.js",
     "server": "SERVER_ROOT=server node server/static-server.js --trace --list --show-dot-files"
   },
