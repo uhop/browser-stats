@@ -141,8 +141,10 @@ export const compare = (a, b, defaultValue = 0) => {
   return a.buildMeta.length - b.buildMeta.length;
 };
 
-export const match = (version, targetString) => {
-  const [a, b] = targetString.split('-').map(ver => parse(ver, any));
+export const getRange = targetString => targetString.split('-').map(ver => parse(ver, any));
+
+export const match = (version, range) => {
+  const [a, b] = typeof range == 'string' ? getRange(range) : range;
   a.prerelease = a.buildMeta = any;
   if (!b) return !compare(version, a);
   b.prerelease = b.buildMeta = any;

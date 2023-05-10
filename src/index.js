@@ -9,16 +9,18 @@ import takeWhile from 'stream-chain/utils/takeWhile.js';
 import removeRows from './removeRows.js';
 import asObjects from './asObjects.js';
 import {known, translate} from './browsers.js';
-import {difference, intersectionInPlace} from './set-ops.js';
-import {collectFeatures, getAllFeatures} from './features.js';
+import {difference} from './set-ops.js';
+import {collectFeatures, getAllFeatures, getAllFeatureTitles} from './features.js';
 
 const REPORT_PERCENTAGE = [0.95, 0.97, 0.99, 0.995, 0.997, 0.999];
+const REPORT_FEATURES = ['es5', 'es6'];
 
 const getNumber = s => parseInt(s.replace(/,/g, ''));
 
 const percentage = [...REPORT_PERCENTAGE, 2].sort((a, b) => a - b);
 
-const dataFileName = new URL('../data/raw.csv', import.meta.url);
+const inputFileName = new URL('../data/raw.csv', import.meta.url),
+  outputFileName = new URL('../server/output.json', import.meta.url);
 
 const getStats = () =>
   new Promise((resolve, reject) => {
@@ -28,7 +30,7 @@ const getStats = () =>
       totalUsers = 0;
 
     const pipeline = new Chain([
-      fs.createReadStream(dataFileName),
+      fs.createReadStream(inputFileName),
       new Parser(),
       new StreamValues(),
       removeRows,
@@ -71,10 +73,17 @@ const getStats = () =>
 
 const main = () =>
   new Promise(async (resolve, reject) => {
-    const {knownBrowsers, unknownBrowsers, unknownUsers, totalUsers} = await getStats().catch(
-      error => (reject(error), Promise.reject(error))
-    ),
-    adjustedTotalUsers = totalUsers - unknownUsers;
+    const stats = await getStats().catch(error => (reject(error), Promise.reject(error))),
+      {knownBrowsers, unknownBrowsers, unknownUsers, totalUsers} = stats,
+      adjustedTotalUsers = totalUsers - unknownUsers,
+      globalResults = {stats, frames: [], features: {}, featureTitles: getAllFeatureTitles()};
+    globalResults.stats.adjustedTotalUsers = adjustedTotalUsers;
+    {
+      const unknown = (globalResults.stats.unknownBrowsers = {});
+      for (const [key, value] of unknownBrowsers) {
+        unknown[key] = value;
+      }
+    }
 
     console.log('Total users:     ', totalUsers);
     console.log('Known browsers:  ', knownBrowsers);
@@ -87,7 +96,7 @@ const main = () =>
       currentUsers = 0;
 
     const pipeline = new Chain([
-      fs.createReadStream(dataFileName),
+      fs.createReadStream(inputFileName),
       new Parser(),
       new StreamValues(),
       removeRows,
@@ -100,22 +109,40 @@ const main = () =>
           features = collectFeatures(browser, version, currentFeatures);
 
         currentFeatures = features;
-        // !currentFeatures.size && console.log(browser, version, features.size);
+
+        REPORT_FEATURES.forEach(name => {
+          let feature = globalResults.features[name];
+          if (!feature) {
+            globalResults.features[name] = feature = {users: 0, unsupported: {}};
+          }
+          if (currentFeatures.has(name)) {
+            feature.users += users;
+          } else {
+            feature.unsupported[data.Browser + ' ' + data['Browser Version']] = users;
+          }
+        });
 
         currentUsers += users;
-        // console.log(currentUsers / adjustedTotalUsers, percentage[0]);
+
         for (const ratio = currentUsers / adjustedTotalUsers; ratio >= percentage[0]; percentage.shift()) {
           console.log('\nPERCENTAGE:', (percentage[0] * 100).toFixed(2));
 
+          const frame = {users: currentUsers};
           if (previousFeatures) {
             const removedFeatures = difference(previousFeatures, currentFeatures);
             removedFeatures.size && console.log('REMOVED:', Array.from(removedFeatures).join(', '));
             const addedFeatures = difference(currentFeatures, previousFeatures);
             addedFeatures.size && console.log('ADDED:', Array.from(addedFeatures).join(', '));
             !removedFeatures.size && !addedFeatures.size && console.log('NO CHANGES');
+
+            frame.removed = Array.from(removedFeatures);
+            frame.added = Array.from(addedFeatures);
           } else {
             console.log('AVAILABLE:', Array.from(currentFeatures).join(', '));
+
+            frame.available = Array.from(currentFeatures);
           }
+          globalResults.frames.push(frame);
 
           previousFeatures = new Set(currentFeatures);
         }
@@ -130,13 +157,14 @@ const main = () =>
       if (!previousFeatures) {
         console.log('\nPERCENTAGE:', ((currentUsers / adjustedTotalUsers) * 100).toFixed(2));
         console.log('AVAILABLE:', Array.from(currentFeatures).join(', '));
+        globalResults.frames.push({
+          users: currentUsers,
+          available: Array.from(currentFeatures)
+        });
       }
-      if (unknownBrowsers.size) {
-        console.log('\nUNKNOWN BROWSERS:');
-        for (const [key, value] of unknownBrowsers) {
-          console.log(key, value);
-        }
-      }
+
+      fs.writeFileSync(outputFileName, JSON.stringify(globalResults, null, 2));
+
       resolve(true);
     });
   });

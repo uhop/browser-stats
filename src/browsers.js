@@ -9,7 +9,7 @@ const browsers = Object.assign(Object.create(null), {
   Edge: 'edge',
   Firefox: 'firefox',
   'Samsung Internet': 'samsung',
-  'Android Webview': 'android',
+  'Android Webview': 'chrome',
   'Safari (in-app)': 'ios_saf',
   Opera: 'opera',
   'Android Browser': 'android',

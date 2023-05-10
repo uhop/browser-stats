@@ -1,0 +1,238 @@
+/* generic setup */
+
+:root {
+  color-scheme: light dark;
+  --app-bg-color: white;
+  --app-fg-color: #333;
+  --app-table-color: #ccc;
+  --app-missing-color: darkred;
+  --app-link-color: #333;
+  --app-link-visited-color: #888;
+  --app-link-missing-color: #ccc;
+  --app-link-visited-missing-color: #888;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg-color: black;
+    --app-fg-color: #ddd;
+    --app-table-color: #444;
+    --app-missing-color: darkred;
+    --app-link-color: #ccc;
+    --app-link-visited-color: #888;
+  }
+}
+
+body {
+  background-color: var(--app-bg-color);
+  color: var(--app-fg-color);
+}
+
+code {
+  border: 1px solid var(--app-table-color);
+  border-radius: 0.3em;
+  padding: 0.2em 0.5em;
+  font-size: 110%;
+}
+
+/* controls */
+
+form.feature-control {
+  display: flex;
+  flex-flow: row wrap;
+  margin-bottom: 1em;
+}
+
+form.feature-control > fieldset {
+  display: flex;
+  flex-flow: column wrap;
+  padding: 0.5em;
+}
+
+/* feature list */
+
+p.feature-list > span.feature-item {
+  display: inline-block;
+  padding: 0.1em 0.3em;
+  margin: 0.2em;
+  background-color: var(--app-missing-color);
+}
+
+p.feature-list > span.feature-item > a {
+  color: var(--app-link-missing-color);
+  text-decoration: none;
+}
+
+p.feature-list > span.feature-item > a:visited {
+  color: var(--app-link-visited-missing-color);
+}
+
+p.feature-list > span.feature-item > a:hover {
+  text-decoration: underline;
+}
+
+p.feature-list.hide-missing > span.feature-item {
+  display: none;
+}
+
+p.feature-list.frame0 > span.frame0,
+p.feature-list.frame1 > span.frame1,
+p.feature-list.frame2 > span.frame2,
+p.feature-list.frame3 > span.frame3,
+p.feature-list.frame4 > span.frame4,
+p.feature-list.frame5 > span.frame5,
+p.feature-list.frame6 > span.frame6,
+p.feature-list.frame7 > span.frame7,
+p.feature-list.frame8 > span.frame8,
+p.feature-list.frame9 > span.frame9 {
+  display: inline-block;
+  background-color: inherit;
+}
+
+p.feature-list.frame0 > span.frame0 > a,
+p.feature-list.frame1 > span.frame1 > a,
+p.feature-list.frame2 > span.frame2 > a,
+p.feature-list.frame3 > span.frame3 > a,
+p.feature-list.frame4 > span.frame4 > a,
+p.feature-list.frame5 > span.frame5 > a,
+p.feature-list.frame6 > span.frame6 > a,
+p.feature-list.frame7 > span.frame7 > a,
+p.feature-list.frame8 > span.frame8 > a,
+p.feature-list.frame9 > span.frame9 > a {
+  color: var(--app-link-color);
+}
+
+p.feature-list.frame0 > span.frame0 > a:visited,
+p.feature-list.frame1 > span.frame1 > a:visited,
+p.feature-list.frame2 > span.frame2 > a:visited,
+p.feature-list.frame3 > span.frame3 > a:visited,
+p.feature-list.frame4 > span.frame4 > a:visited,
+p.feature-list.frame5 > span.frame5 > a:visited,
+p.feature-list.frame6 > span.frame6 > a:visited,
+p.feature-list.frame7 > span.frame7 > a:visited,
+p.feature-list.frame8 > span.frame8 > a:visited,
+p.feature-list.frame9 > span.frame9 > a:visited {
+  color: var(--app-link-visited-color);
+}
+
+p.feature-list.hide-available.frame0 > span.frame0,
+p.feature-list.hide-available.frame1 > span.frame1,
+p.feature-list.hide-available.frame2 > span.frame2,
+p.feature-list.hide-available.frame3 > span.frame3,
+p.feature-list.hide-available.frame4 > span.frame4,
+p.feature-list.hide-available.frame5 > span.frame5,
+p.feature-list.hide-available.frame6 > span.frame6,
+p.feature-list.hide-available.frame7 > span.frame7,
+p.feature-list.hide-available.frame8 > span.frame8,
+p.feature-list.hide-available.frame9 > span.frame9 {
+  display: none;
+}
+
+/* table */
+
+table.feature-list tr.feature-item {
+  background-color: var(--app-missing-color);
+}
+
+table.feature-list tr.feature-item a {
+  color: var(--app-link-missing-color);
+  text-decoration: none;
+}
+
+table.feature-list tr.feature-item td {
+  color: var(--app-link-missing-color);
+}
+
+table.feature-list tr.feature-item a:visited {
+  color: var(--app-link-visited-missing-color);
+}
+
+table.feature-list span.feature-item a:hover {
+  text-decoration: underline;
+}
+
+table.feature-list.hide-missing tr.feature-item {
+  display: none;
+}
+
+table.feature-list.frame0 tr.frame0,
+table.feature-list.frame1 tr.frame1,
+table.feature-list.frame2 tr.frame2,
+table.feature-list.frame3 tr.frame3,
+table.feature-list.frame4 tr.frame4,
+table.feature-list.frame5 tr.frame5,
+table.feature-list.frame6 tr.frame6,
+table.feature-list.frame7 tr.frame7,
+table.feature-list.frame8 tr.frame8,
+table.feature-list.frame9 tr.frame9 {
+  display: table-row;
+  background-color: inherit;
+}
+
+table.feature-list.frame0 tr.frame0 a,
+table.feature-list.frame1 tr.frame1 a,
+table.feature-list.frame2 tr.frame2 a,
+table.feature-list.frame3 tr.frame3 a,
+table.feature-list.frame4 tr.frame4 a,
+table.feature-list.frame5 tr.frame5 a,
+table.feature-list.frame6 tr.frame6 a,
+table.feature-list.frame7 tr.frame7 a,
+table.feature-list.frame8 tr.frame8 a,
+table.feature-list.frame9 tr.frame9 a {
+  color: var(--app-link-color);
+}
+
+table.feature-list.frame0 tr.frame0 a:visited,
+table.feature-list.frame1 tr.frame1 a:visited,
+table.feature-list.frame2 tr.frame2 a:visited,
+table.feature-list.frame3 tr.frame3 a:visited,
+table.feature-list.frame4 tr.frame4 a:visited,
+table.feature-list.frame5 tr.frame5 a:visited,
+table.feature-list.frame6 tr.frame6 a:visited,
+table.feature-list.frame7 tr.frame7 a:visited,
+table.feature-list.frame8 tr.frame8 a:visited,
+table.feature-list.frame9 tr.frame9 a:visited {
+  color: var(--app-link-visited-color);
+}
+
+table.feature-list.frame0 tr.frame0 td,
+table.feature-list.frame1 tr.frame1 td,
+table.feature-list.frame2 tr.frame2 td,
+table.feature-list.frame3 tr.frame3 td,
+table.feature-list.frame4 tr.frame4 td,
+table.feature-list.frame5 tr.frame5 td,
+table.feature-list.frame6 tr.frame6 td,
+table.feature-list.frame7 tr.frame7 td,
+table.feature-list.frame8 tr.frame8 td,
+table.feature-list.frame9 tr.frame9 td {
+  color: var(--app-link-color);
+}
+
+table.feature-list.hide-available.frame0 tr.frame0,
+table.feature-list.hide-available.frame1 tr.frame1,
+table.feature-list.hide-available.frame2 tr.frame2,
+table.feature-list.hide-available.frame3 tr.frame3,
+table.feature-list.hide-available.frame4 tr.frame4,
+table.feature-list.hide-available.frame5 tr.frame5,
+table.feature-list.hide-available.frame6 tr.frame6,
+table.feature-list.hide-available.frame7 tr.frame7,
+table.feature-list.hide-available.frame8 tr.frame8,
+table.feature-list.hide-available.frame9 tr.frame9 {
+  display: none;
+}
+
+/* feature table styling */
+
+table.feature-list {
+  border: 1px solid var(--app-table-color);
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table.feature-list th,
+table.feature-list td {
+  vertical-align: middle;
+  text-align: left;
+  padding: 0.3em 0.5em;
+  border: 1px solid var(--app-table-color);
+}

@@ -1,14 +1,21 @@
 import lite from 'caniuse-lite';
 
-import {parse, match} from './version.js';
+import {parse, getRange, match, compare} from './version.js';
 
 const hasFeature = (browser, version, {stats}) => {
   if (!(browser in stats)) return false;
   const versions = stats[browser];
+  let highestVersion = null;
   for (const key in versions) {
-    if (key === 'TP' || !match(version, key)) continue;
-    return versions[key] === 'y';
+    if (key === 'TP') continue;
+    const range = getRange(key),
+      hasFeature = versions[key].charAt(0) === 'y';
+    if (!highestVersion || compare(highestVersion, range[range.length - 1]) < 0) {
+      highestVersion = hasFeature ? range[range.length - 1] : null;
+    }
+    if (match(version, range)) return hasFeature;
   }
+  if (highestVersion) return compare(highestVersion, version) <= 0;
   return false;
 };
 
@@ -24,6 +31,14 @@ export const collectFeatures = (browser, version, features = getAllFeatures()) =
     if (hasFeature(browser, version, feature)) {
       result.add(name);
     }
+  }
+  return result;
+};
+
+export const getAllFeatureTitles = () => {
+  const result = {};
+  for (const name of Object.keys(lite.features)) {
+    result[name] = lite.feature(lite.features[name]).title;
   }
   return result;
 };

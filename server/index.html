@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <title>browser-stats</title>
+    <link rel="preload" as="style" href="index.css" />
+    <link rel="modulepreload" href="formatters.js" />
+    <link rel="modulepreload" href="index.js" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+    </style>
+    <script type="module">
+      const fetchData = async () => {
+        const dataFileName = (new URL(document.location.href).searchParams.get('data') || 'output') + '.json',
+          data = await fetch(dataFileName);
+        return data.ok ? data.json() : null;
+      };
+      window.appDataPromise = fetchData();
+    </script>
+    <link rel="stylesheet" href="index.css" />
+    <script type="module" defer src="index.js"></script>
+  </head>
+  <body>
+    <h1>browser-stats</h1>
+    <div id="app"></div>
+  </body>
+</html>
