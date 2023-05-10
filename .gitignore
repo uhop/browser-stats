@@ -1,7 +1,8 @@
 node_modules/
-report/
-coverage/
+/report/
+/coverage/
 .AppleDouble
 .DS_Store
 
-data/
+/data/
+/server/output.json
