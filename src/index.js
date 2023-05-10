@@ -10,7 +10,7 @@ import removeRows from './removeRows.js';
 import asObjects from './asObjects.js';
 import {known, translate} from './browsers.js';
 import {difference} from './set-ops.js';
-import {collectFeatures, getAllFeatures, getAllFeatureTitles} from './features.js';
+import {collectFeatures, getAllFeatures, getAllFeatureTitles, hasFeatureByName} from './features.js';
 
 const REPORT_PERCENTAGE = [0.95, 0.97, 0.99, 0.995, 0.997, 0.999];
 const REPORT_FEATURES = ['es5', 'es6'];
@@ -114,9 +114,9 @@ const main = () =>
         REPORT_FEATURES.forEach(name => {
           let feature = globalResults.features[name];
           if (!feature) {
-            globalResults.features[name] = feature = {users: 0, unsupported: {}};
+            feature = globalResults.features[name] = {users: 0, unsupported: {}};
           }
-          if (currentFeatures.has(name)) {
+          if (hasFeatureByName(browser, version, name)) {
             feature.users += users;
           } else {
             feature.unsupported[data.Browser + ' ' + data['Browser Version']] = users;

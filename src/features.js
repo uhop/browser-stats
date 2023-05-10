@@ -42,3 +42,11 @@ export const getAllFeatureTitles = () => {
   }
   return result;
 };
+
+export const hasFeatureByName = (browser, version, featureName) => {
+  if (typeof version == 'string') {
+    version = parse(version);
+  }
+  const feature = lite.feature(lite.features[featureName]);
+  return hasFeature(browser, version, feature);
+};
