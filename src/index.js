@@ -155,6 +155,7 @@ const main = () =>
     console.log('Adjusted users:  ', adjustedTotalUsers);
 
     const browsers = clusterVersions(knownBrowsers, clusterValue);
+    globalResults.stats.uniqueBrowsers = browsers.length;
     console.log('Unique browsers: ', browsers.length);
 
     let previousFeatures = null,

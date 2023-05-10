@@ -6,21 +6,24 @@ const makeHeader = (root, data) => {
   const totalUnknownBrowsers = Object.keys(data.stats.unknownBrowsers).length,
     section = h('section'),
     p1 = h('p'),
-    p2 = h('p');
+    p2 = h('p'),
+    p3 = h('p');
 
   p1.innerHTML = `Statistics: found ${formatInteger(
     data.stats.knownBrowsers + totalUnknownBrowsers
   )} distinct browsers &mdash;
     ${formatInteger(data.stats.knownBrowsers)} known and ${formatInteger(
     totalUnknownBrowsers
-  )} unknown browsers. The unknown browsers cover ${formatInteger(data.stats.unknownUsers)} users (${formatNumber(
+  )} unknown browsers. After clustering we found ${formatInteger(data.stats.uniqueBrowsers)} unique browsers.`;
+
+  p2.innerHTML = `The unknown browsers cover ${formatInteger(data.stats.unknownUsers)} users (${formatNumber(
     (data.stats.unknownUsers / data.stats.totalUsers) * 100,
     {decimals: 2}
-  )}%). The latter browsers and users will be ignored.`;
+  )}%). Users of unknown browsers will be ignored.`;
 
-  p2.innerHTML = `The data below cover ${formatInteger(data.stats.adjustedTotalUsers)} users with known browsers.`;
+  p3.innerHTML = `The data below cover ${formatInteger(data.stats.adjustedTotalUsers)} users with known browsers.`;
 
-  section.append(p1, p2);
+  section.append(p1, p2, p3);
   root.append(section);
 };
 
