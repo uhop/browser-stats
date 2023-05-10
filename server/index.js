@@ -89,6 +89,78 @@ const makeTable = (root, data) => {
   root.append(section);
 };
 
+const listBrowserFrameClasses = (from, to) => {
+  const results = [];
+  for (let i = from; i < to; ++i) {
+    results.push('frame' + i);
+  }
+  return results;
+};
+
+const makeBrowserTable = (root, data) => {
+  const featureFrames = calcFeatureFrames(data);
+
+  const table = h('table');
+  table.className = 'browser-list frame0';
+
+  let currentBrowserIndex = 0;
+  table.innerHTML =
+    '<thead><tr><th class="right">#</th><th>Original browser name</th><th>Original browser version</th><th>Browser</th><th>Version</th><th class="right">Users</th></tr></thead><tbody>' +
+    data.frames
+      .map((frame, index) =>
+        frame.browsers
+          .map(
+            item =>
+              `<tr class="browser-item ${listBrowserFrameClasses(index, data.frames.length).join(
+                ' '
+              )}"><td class="right">${formatInteger(++currentBrowserIndex)}</td><td>${
+                item.originalBrowserName
+              }</td><td>${item.originalBrowserVersion}</td><td>${item.browser}</td><td>${item.version.major}.${
+                item.version.minor
+              }.${item.version.patch}.${item.version.build}</td><td class="right">${formatInteger(
+                item.users
+              )}</td></tr>`
+          )
+          .join('')
+      )
+      .join('') +
+    '</tbody>';
+
+  const section = h('section'),
+    details = h('details'),
+    summary = h('summary');
+  summary.innerHTML = 'The list of known browsers';
+  details.append(summary, table);
+  section.append(details);
+  root.append(section);
+};
+
+const makeUnknownBrowserTable = (root, data) => {
+  const table = h('table');
+  table.className = 'unknown-browser-list frame0';
+
+  let currentBrowserIndex = 0;
+  table.innerHTML =
+    '<thead><tr><th class="right">#</th><th>Browser</th><th class="right">Users</th></tr></thead><tbody>' +
+    Object.keys(data.stats.unknownBrowsers)
+      .map(
+        name =>
+          `<tr class="unknown-browser-item"><td class="right">${formatInteger(
+            ++currentBrowserIndex
+          )}</td><td>${name}</td><td class="right">${formatInteger(data.stats.unknownBrowsers[name])}</td></tr>`
+      )
+      .join('') +
+    '</tbody>';
+
+  const section = h('section'),
+    details = h('details'),
+    summary = h('summary');
+  summary.innerHTML = 'The list of unknown browsers';
+  details.append(summary, table);
+  section.append(details);
+  root.append(section);
+};
+
 const makeInput = (type, name, value, labelText, active) => {
   const input = h('input');
   input.type = type;
@@ -155,7 +227,7 @@ const makeControls = (root, data) => {
     if (target.type === 'radio') {
       if (target.name === 'frame') {
         const oldFrames = Array.from(roots[0].classList).filter(name => /^frame\d+$/.test(name));
-        Array.from(roots).forEach(root => {
+        [...roots, ...document.querySelectorAll('.browser-list')].forEach(root => {
           root.classList.remove(...oldFrames);
           root.classList.add(target.value);
         });
@@ -187,10 +259,12 @@ const makeControls = (root, data) => {
     if (target.type === 'checkbox') {
       if (target.name === 'table') {
         Array.from(roots).forEach(root => {
+          const section = root.closest('section');
+          if (!section) return;
           if (root.tagName === 'TABLE') {
-            root.parentElement.style.display = target.checked ? 'block' : 'none';
+            section.style.display = target.checked ? 'block' : 'none';
           } else {
-            root.parentElement.style.display = target.checked ? 'none' : 'block';
+            section.style.display = target.checked ? 'none' : 'block';
           }
         });
       }
@@ -224,8 +298,28 @@ const main = async () => {
 
   makeHeader(root, data);
   makeControls(root, data);
+
+  {
+    const h2 = h('h2');
+    h2.innerHTML = 'Features';
+    root.append(h2);
+  }
   makeList(root, data);
   makeTable(root, data);
+
+  {
+    const h2 = h('h2');
+    h2.innerHTML = 'Browsers';
+    root.append(h2);
+  }
+  makeBrowserTable(root, data);
+
+  {
+    const h2 = h('h2');
+    h2.innerHTML = 'Unknown browsers';
+    root.append(h2);
+  }
+  makeUnknownBrowserTable(root, data);
 };
 
 document.addEventListener('DOMContentLoaded', main);

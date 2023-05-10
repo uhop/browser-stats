@@ -35,6 +35,10 @@ code {
   font-size: 110%;
 }
 
+details > summary {
+  margin-bottom: 0.5em;
+}
+
 /* controls */
 
 form.feature-control {
@@ -128,7 +132,21 @@ p.feature-list.hide-available.frame9 > span.frame9 {
   display: none;
 }
 
-/* table */
+/* feature table */
+
+table.feature-list {
+  border: 1px solid var(--app-table-color);
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table.feature-list th,
+table.feature-list td {
+  vertical-align: middle;
+  text-align: left;
+  padding: 0.3em 0.5em;
+  border: 1px solid var(--app-table-color);
+}
 
 table.feature-list tr.feature-item {
   background-color: var(--app-missing-color);
@@ -221,18 +239,139 @@ table.feature-list.hide-available.frame9 tr.frame9 {
   display: none;
 }
 
-/* feature table styling */
+/* browser table */
 
-table.feature-list {
+table.browser-list {
   border: 1px solid var(--app-table-color);
   border-spacing: 0;
   border-collapse: collapse;
 }
 
-table.feature-list th,
-table.feature-list td {
+table.browser-list th,
+table.browser-list td {
   vertical-align: middle;
   text-align: left;
   padding: 0.3em 0.5em;
   border: 1px solid var(--app-table-color);
+}
+
+table.browser-list th.right,
+table.browser-list td.right {
+  text-align: right;
+}
+
+table.browser-list tr.browser-item {
+  background-color: var(--app-missing-color);
+}
+
+table.browser-list tr.browser-item a {
+  color: var(--app-link-missing-color);
+  text-decoration: none;
+}
+
+table.browser-list tr.browser-item td {
+  color: var(--app-link-missing-color);
+}
+
+table.browser-list tr.browser-item a:visited {
+  color: var(--app-link-visited-missing-color);
+}
+
+table.browser-list span.browser-item a:hover {
+  text-decoration: underline;
+}
+
+table.browser-list.hide-missing tr.browser-item {
+  display: none;
+}
+
+table.browser-list.frame0 tr.frame0,
+table.browser-list.frame1 tr.frame1,
+table.browser-list.frame2 tr.frame2,
+table.browser-list.frame3 tr.frame3,
+table.browser-list.frame4 tr.frame4,
+table.browser-list.frame5 tr.frame5,
+table.browser-list.frame6 tr.frame6,
+table.browser-list.frame7 tr.frame7,
+table.browser-list.frame8 tr.frame8,
+table.browser-list.frame9 tr.frame9 {
+  display: table-row;
+  background-color: inherit;
+}
+
+table.browser-list.frame0 tr.frame0 a,
+table.browser-list.frame1 tr.frame1 a,
+table.browser-list.frame2 tr.frame2 a,
+table.browser-list.frame3 tr.frame3 a,
+table.browser-list.frame4 tr.frame4 a,
+table.browser-list.frame5 tr.frame5 a,
+table.browser-list.frame6 tr.frame6 a,
+table.browser-list.frame7 tr.frame7 a,
+table.browser-list.frame8 tr.frame8 a,
+table.browser-list.frame9 tr.frame9 a {
+  color: var(--app-link-color);
+}
+
+table.browser-list.frame0 tr.frame0 a:visited,
+table.browser-list.frame1 tr.frame1 a:visited,
+table.browser-list.frame2 tr.frame2 a:visited,
+table.browser-list.frame3 tr.frame3 a:visited,
+table.browser-list.frame4 tr.frame4 a:visited,
+table.browser-list.frame5 tr.frame5 a:visited,
+table.browser-list.frame6 tr.frame6 a:visited,
+table.browser-list.frame7 tr.frame7 a:visited,
+table.browser-list.frame8 tr.frame8 a:visited,
+table.browser-list.frame9 tr.frame9 a:visited {
+  color: var(--app-link-visited-color);
+}
+
+table.browser-list.frame0 tr.frame0 td,
+table.browser-list.frame1 tr.frame1 td,
+table.browser-list.frame2 tr.frame2 td,
+table.browser-list.frame3 tr.frame3 td,
+table.browser-list.frame4 tr.frame4 td,
+table.browser-list.frame5 tr.frame5 td,
+table.browser-list.frame6 tr.frame6 td,
+table.browser-list.frame7 tr.frame7 td,
+table.browser-list.frame8 tr.frame8 td,
+table.browser-list.frame9 tr.frame9 td {
+  color: var(--app-link-color);
+}
+
+table.browser-list.hide-available.frame0 tr.frame0,
+table.browser-list.hide-available.frame1 tr.frame1,
+table.browser-list.hide-available.frame2 tr.frame2,
+table.browser-list.hide-available.frame3 tr.frame3,
+table.browser-list.hide-available.frame4 tr.frame4,
+table.browser-list.hide-available.frame5 tr.frame5,
+table.browser-list.hide-available.frame6 tr.frame6,
+table.browser-list.hide-available.frame7 tr.frame7,
+table.browser-list.hide-available.frame8 tr.frame8,
+table.browser-list.hide-available.frame9 tr.frame9 {
+  display: none;
+}
+
+/* unknown browser table */
+
+table.unknown-browser-list {
+  border: 1px solid var(--app-table-color);
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table.unknown-browser-list th,
+table.unknown-browser-list td {
+  vertical-align: middle;
+  text-align: left;
+  padding: 0.3em 0.5em;
+  border: 1px solid var(--app-table-color);
+}
+
+table.unknown-browser-list th.right,
+table.unknown-browser-list td.right {
+  text-align: right;
+}
+
+table.unknown-browser-list tr.unknown-browser-item td {
+  color: var(--app-link-color);
 }
