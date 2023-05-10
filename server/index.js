@@ -129,7 +129,7 @@ const makeBrowserTable = (root, data) => {
   const section = h('section'),
     details = h('details'),
     summary = h('summary');
-  summary.innerHTML = 'The list of known browsers';
+  summary.innerHTML = `The list of known browsers (${formatInteger(currentBrowserIndex)})`;
   details.append(summary, table);
   section.append(details);
   root.append(section);
@@ -155,7 +155,7 @@ const makeUnknownBrowserTable = (root, data) => {
   const section = h('section'),
     details = h('details'),
     summary = h('summary');
-  summary.innerHTML = 'The list of unknown browsers';
+  summary.innerHTML = `The list of unknown browsers (${formatInteger(currentBrowserIndex)})`;
   details.append(summary, table);
   section.append(details);
   root.append(section);
