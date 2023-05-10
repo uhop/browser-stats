@@ -143,7 +143,7 @@ const makeBrowserTable = (root, data) => {
 
 const makeUnknownBrowserTable = (root, data) => {
   const table = h('table');
-  table.className = 'unknown-browser-list frame0';
+  table.className = 'unknown-browser-list';
 
   let currentBrowserIndex = 0;
   table.innerHTML =
@@ -285,6 +285,47 @@ const makeControls = (root, data) => {
   root.append(section);
 };
 
+const makeSelectedFeatures = (root, data) => {
+  if (!data.features) return;
+
+  const section = h('section');
+
+  for (const featureName of Object.keys(data.features)) {
+    const {users, unsupported} = data.features[featureName],
+      keys = Object.keys(unsupported),
+      h3 = h('h3'),
+      p = h('p'),
+      details = h('details'),
+      summary = h('summary'),
+      table = h('table');
+    h3.innerHTML = `<a href="https://caniuse.com/${featureName}" title="${data.featureTitles[featureName]}">${featureName}</a>: ${data.featureTitles[featureName]}`;
+    p.innerHTML = `This feature is supported by ${formatInteger(users)} users (${formatNumber(
+      (users / data.stats.adjustedTotalUsers) * 100,
+      {decimals: 2}
+    )}%).`;
+    table.className = 'unknown-browser-list';
+
+    let currentBrowserIndex = 0;
+    table.innerHTML =
+      '<thead><tr><th class="right">#</th><th>Browser</th><th class="right">Users</th></tr></thead><tbody>' +
+      keys
+        .map(
+          name =>
+            `<tr class="unknown-browser-item"><td class="right">${formatInteger(
+              ++currentBrowserIndex
+            )}</td><td>${name}</td><td class="right">${formatInteger(unsupported[name])}</td></tr>`
+        )
+        .join('') +
+      '</tbody>';
+
+    summary.innerHTML = `The list of browsers that do not support this feature (${formatInteger(keys.length)})`;
+    details.append(summary, table);
+    section.append(h3, p, details);
+  }
+
+  root.append(section);
+};
+
 const makeError = root => {
   const p = h('p');
   p.innerHTML =
@@ -326,6 +367,13 @@ const main = async () => {
     root.append(h2);
   }
   makeUnknownBrowserTable(root, data);
+
+  {
+    const h2 = h('h2');
+    h2.innerHTML = 'Selected features';
+    root.append(h2);
+  }
+  makeSelectedFeatures(root, data);
 };
 
 document.addEventListener('DOMContentLoaded', main);
