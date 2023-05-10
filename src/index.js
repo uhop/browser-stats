@@ -93,7 +93,8 @@ const main = () =>
 
     let previousFeatures = null,
       currentFeatures = getAllFeatures(),
-      currentUsers = 0;
+      currentUsers = 0,
+      currentBrowsers = [];
 
     const pipeline = new Chain([
       fs.createReadStream(inputFileName),
@@ -122,12 +123,20 @@ const main = () =>
           }
         });
 
+        currentBrowsers.push({
+          originalBrowserName: data.Browser,
+          originalBrowserVersion: data['Browser Version'],
+          browser,
+          version,
+          users
+        });
+
         currentUsers += users;
 
         for (const ratio = currentUsers / adjustedTotalUsers; ratio >= percentage[0]; percentage.shift()) {
           console.log('\nPERCENTAGE:', (percentage[0] * 100).toFixed(2));
 
-          const frame = {users: currentUsers};
+          const frame = {users: currentUsers, browsers: currentBrowsers};
           if (previousFeatures) {
             const removedFeatures = difference(previousFeatures, currentFeatures);
             removedFeatures.size && console.log('REMOVED:', Array.from(removedFeatures).join(', '));
@@ -144,6 +153,7 @@ const main = () =>
           }
           globalResults.frames.push(frame);
 
+          currentBrowsers = [];
           previousFeatures = new Set(currentFeatures);
         }
 
@@ -159,6 +169,7 @@ const main = () =>
         console.log('AVAILABLE:', Array.from(currentFeatures).join(', '));
         globalResults.frames.push({
           users: currentUsers,
+          browsers: currentBrowsers,
           available: Array.from(currentFeatures)
         });
       }
