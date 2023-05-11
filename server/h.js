@@ -2,13 +2,14 @@
 
 // create.js
 
-const namespaces = {
-    svg: 'http://www.w3.org/2000/svg',
-    xlink: 'http://www.w3.org/1999/xlink',
-    ev: 'http://www.w3.org/2001/xml-events',
-    xml: 'http://www.w3.org/XML/1998/namespace'
-  },
-  parseName = /^(?:(\w+)\:)?([^\s\.#]*)/,
+export const namespaces = {
+  svg: 'http://www.w3.org/2000/svg',
+  xlink: 'http://www.w3.org/1999/xlink',
+  ev: 'http://www.w3.org/2001/xml-events',
+  xml: 'http://www.w3.org/XML/1998/namespace'
+};
+
+const parseName = /^(?:(\w+)\:)?([^\s\.#]*)/,
   parseSelector = /[\.#][^\s\.#]+/g;
 
 export function assignStyle(node, styles) {
