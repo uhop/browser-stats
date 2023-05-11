@@ -317,9 +317,12 @@ export const place = (node, refNode, position) => {
   //   "last":    inserts node as the last child of refNode
   //   anything else is equivalent to "last"
 
+  // the idea with numbers is that node becomes the position-th child
+  // examples: 0 - node is the first child, -1 - node is the last child
+
   if (typeof position == 'number') {
     const children = refNode.childNodes;
-    if (position < 0) position = children.length + position - 1;
+    if (position < 0) position = children.length + position + 1;
     if (!children.length || children.length <= position) {
       refNode.appendChild(node);
     } else {
