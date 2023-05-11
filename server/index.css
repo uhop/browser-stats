@@ -31,8 +31,9 @@ body {
 code {
   border: 1px solid var(--app-table-color);
   border-radius: 0.3em;
-  padding: 0.2em 0.5em;
+  padding: 0.1em 0.3em;
   font-size: 110%;
+  font-weight: bolder;
 }
 
 details > summary {
@@ -60,6 +61,7 @@ p.feature-list > span.feature-item {
   padding: 0.1em 0.3em;
   margin: 0.2em;
   background-color: var(--app-missing-color);
+  transition: background-color 0.5s ease-out;
 }
 
 p.feature-list > span.feature-item > a {
@@ -150,6 +152,7 @@ table.feature-list td {
 
 table.feature-list tr.feature-item {
   background-color: var(--app-missing-color);
+  transition: background-color 0.5s ease-out;
 }
 
 table.feature-list tr.feature-item a {
@@ -262,6 +265,7 @@ table.browser-list td.right {
 
 table.browser-list tr.browser-item {
   background-color: var(--app-missing-color);
+  transition: background-color 0.5s ease-out;
 }
 
 table.browser-list tr.browser-item a {
