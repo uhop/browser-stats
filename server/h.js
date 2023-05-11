@@ -1,4 +1,4 @@
-// copied from https://github.com/heya/dom under BSD-3 and slightly modified
+// Copied from https://github.com/heya/dom under BSD-3 and slightly modified.
 
 // create.js
 
@@ -34,12 +34,12 @@ export function setStyle(node, styles) {
   return node;
 }
 
-export function setData(node, dataset) {
+export const setData = (node, dataset) => {
   for (const [key, value] of Object.entries(dataset)) {
     node.dataset[key] = value;
   }
   return node;
-}
+};
 
 const addListener = (node, name, value) => {
   if (name.substring(0, 2) == 'on') {
