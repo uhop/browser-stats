@@ -61,7 +61,7 @@ p.feature-list > span.feature-item {
   padding: 0.1em 0.3em;
   margin: 0.2em;
   background-color: var(--app-missing-color);
-  transition: background-color 0.5s ease-out;
+  transition: background-color 0.3s ease-out;
 }
 
 p.feature-list > span.feature-item > a {
@@ -152,7 +152,7 @@ table.feature-list td {
 
 table.feature-list tr.feature-item {
   background-color: var(--app-missing-color);
-  transition: background-color 0.5s ease-out;
+  transition: background-color 0.3s ease-out;
 }
 
 table.feature-list tr.feature-item a {
@@ -265,7 +265,7 @@ table.browser-list td.right {
 
 table.browser-list tr.browser-item {
   background-color: var(--app-missing-color);
-  transition: background-color 0.5s ease-out;
+  transition: background-color 0.3s ease-out;
 }
 
 table.browser-list tr.browser-item a {
