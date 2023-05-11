@@ -351,7 +351,7 @@ server.on('listening', () => {
       yellow(rootFolder) +
       grey('. Use ') +
       yellow('Ctrl+C') +
-      grey(' to terminate the server\n')
+      grey(' to terminate the server.\n')
   );
 });
 
