@@ -1,6 +1,7 @@
 // Copied from https://github.com/heya/dom under BSD-3 and slightly modified.
 
 // create.js
+// Dojo-inspired set of DOM utilities
 
 export const namespaces = {
   svg: 'http://www.w3.org/2000/svg',
@@ -204,6 +205,7 @@ export const create = (tag, attributes, parent, ns, options) => {
 };
 
 // build.js
+// Loosely based on JsonML (http://www.jsonml.org/) ideas, inspired by Virtual DOM techniques
 
 const textTypes = {string: 1, number: 1, boolean: 1};
 
@@ -367,8 +369,8 @@ export const place = (node, refNode, position) => {
 };
 
 // hyperscript.js
+// Implements hyperscript (https://github.com/dominictarr/hyperscript).
 
-// implementing hyperscript (see https://github.com/dominictarr/hyperscript)
 export const h = (node, ...children) => {
   if (typeof node == 'string') {
     node = create(node);
