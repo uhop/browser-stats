@@ -13,30 +13,30 @@ const parseName = /^(?:(\w+)\:)?([^\s\.#]*)/,
   parseSelector = /[\.#][^\s\.#]+/g;
 
 export function assignStyle(node, styles) {
-  for (const key of Object.keys(styles)) {
+  for (const [key, value] of Object.entries(styles)) {
     if (key === '$') {
-      setStyle(node, styles.$);
+      setStyle(node, value);
     } else {
-      node.style[key] = styles[key];
+      node.style[key] = value;
     }
   }
   return node;
 }
 
 export function setStyle(node, styles) {
-  for (const key of Object.keys(styles)) {
+  for (const [key, value] of Object.entries(styles)) {
     if (key === '$') {
-      assignStyle(node, styles.$);
+      assignStyle(node, value);
     } else {
-      node.style.setProperty(key, styles[key]);
+      node.style.setProperty(key, value);
     }
   }
   return node;
 }
 
 export function setData(node, dataset) {
-  for (const key of Object.keys(dataset)) {
-    node.dataset[key] = dataset[key];
+  for (const [key, value] of Object.entries(dataset)) {
+    node.dataset[key] = value;
   }
   return node;
 }
