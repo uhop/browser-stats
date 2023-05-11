@@ -52,7 +52,11 @@ export function setProps(node, props, options) {
   for (const [key, value] of Object.entries(props)) {
     switch (key) {
       case '$':
-        setAttrs(node, value, options);
+        if (options && typeof options.setComponentAttributes == 'function' && node.tagName.indexOf('-') > 0) {
+          options.setComponentAttributes(node, value, options);
+        } else {
+          setAttrs(node, value, options);
+        }
         break;
       case 'style':
         if (typeof value == 'string') {
