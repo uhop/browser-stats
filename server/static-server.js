@@ -63,7 +63,7 @@ const join = (...args) => args.map(value => value || '').join(''),
   yellow = paint('\x1B[93m'),
   blue = paint('\x1B[44;97m', '\x1B[49;39m');
 
-const link = (url, title = url) => '\x1B]8;;' + url + '\x1B\\' + title + '\x1B]8;;\x1B\\';
+const link = hasColors ? (url, title = url) => '\x1B]8;;' + url + '\x1B\\' + title + '\x1B]8;;\x1B\\' : url => url;
 
 // sending helpers
 
