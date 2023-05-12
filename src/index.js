@@ -56,7 +56,7 @@ const getStats = () =>
       new Parser(),
       new StreamValues(),
       removeRows,
-      takeWhile(data => data.value[0] !== 'Day Index'),
+      takeWhile(data => !/^\w+\sIndex/i.test(data.value[0])),
       asObjects(),
       data => {
         const browser = data.Browser,
