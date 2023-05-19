@@ -224,7 +224,7 @@ const makeBrowserTable = (root, data) => {
     ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Version'], ['th.right', 'Users']]],
     [
       'tbody',
-      ...data.frames
+      data.frames
         .map((frame, index) =>
           frame.browsers.map(item => [
             'tr',
@@ -235,7 +235,6 @@ const makeBrowserTable = (root, data) => {
             ['td.right', formatInteger(item.users)]
           ])
         )
-        .flat()
     ]
   ];
   build(
@@ -289,7 +288,7 @@ const makeSelectedFeatures = (root, data) => {
   build(
     [
       'section',
-      ...Object.entries(data.features)
+      Object.entries(data.features)
         .map(([featureName, {users, unsupported}]) => {
           const keys = Object.keys(unsupported);
           return [
@@ -312,7 +311,6 @@ const makeSelectedFeatures = (root, data) => {
             ]
           ];
         })
-        .flat()
     ],
     root
   );
