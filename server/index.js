@@ -23,7 +23,7 @@ const makeHeader = (root, data) => {
         `The unknown browsers cover ${formatInteger(data.stats.unknownUsers)} users (${formatNumber(
           (data.stats.unknownUsers / data.stats.totalUsers) * 100,
           {decimals: 2}
-        )}%). Users of unknown browsers will be ignored.`
+        )}%). The users of unknown browsers will be ignored.`
       ],
       ['p', `The data below cover ${formatInteger(data.stats.adjustedTotalUsers)} users with known browsers.`]
     ],
