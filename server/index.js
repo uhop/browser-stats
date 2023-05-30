@@ -149,54 +149,48 @@ const calcFeatureFrames = data => {
   });
 };
 
-const makeList = (root, data) => {
+const makeList = data => {
   const featureFrames = calcFeatureFrames(data);
-  build(
+  return build([
+    'section',
     [
-      'section',
-      [
-        'p.feature-list.frame0',
-        ...data.frames[0].available.map(featureName => [
-          `span.feature-item${listFrameClasses(featureName, featureFrames)
-            .map(name => '.' + name)
-            .join('')}`,
-          ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName] || ''}, featureName]
-        ])
-      ]
-    ],
-    root
-  );
+      'p.feature-list.frame0',
+      data.frames[0].available.map(featureName => [
+        `span.feature-item${listFrameClasses(featureName, featureFrames)
+          .map(name => '.' + name)
+          .join('')}`,
+        ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName] || ''}, featureName]
+      ])
+    ]
+  ]);
 };
 
-const makeTable = (root, data) => {
+const makeTable = data => {
   const featureFrames = calcFeatureFrames(data);
-  build(
+  return build([
+    'section',
+    {style: {display: 'none'}},
     [
-      'section',
-      {style: {display: 'none'}},
+      'table.feature-list.frame0',
+      ['thead', ['tr', ['th', 'Feature name'], ['th', 'Description']]],
       [
-        'table.feature-list.frame0',
-        ['thead', ['tr', ['th', 'Feature name'], ['th', 'Description']]],
-        [
-          'tbody',
-          ...data.frames[0].available.map(featureName => [
-            'tr',
-            {className: ['feature-item', ...listFrameClasses(featureName, featureFrames)]},
+        'tbody',
+        data.frames[0].available.map(featureName => [
+          'tr',
+          {className: ['feature-item', ...listFrameClasses(featureName, featureFrames)]},
+          [
+            'td',
             [
-              'td',
-              [
-                'a',
-                {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName] || ''},
-                featureName
-              ]
-            ],
-            ['td', data.featureTitles[featureName] || '']
-          ])
-        ]
+              'a',
+              {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName] || ''},
+              featureName
+            ]
+          ],
+          ['td', data.featureTitles[featureName] || '']
+        ])
       ]
-    ],
-    root
-  );
+    ]
+  ]);
 };
 
 const listBrowserFrameClasses = (from, to) => {
@@ -217,40 +211,36 @@ export const stringify = version =>
   (version.prerelease ? '-' + prerelease : '') +
   (version.buildMeta ? '+' + buildMeta : '');
 
-const makeBrowserTable = (root, data) => {
+const makeBrowserTable = data => {
   let currentBrowserIndex = 0;
   const table = [
     'table.browser-list.frame0',
     ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Version'], ['th.right', 'Users']]],
     [
       'tbody',
-      data.frames
-        .map((frame, index) =>
-          frame.browsers.map(item => [
-            'tr',
-            {className: ['browser-item', ...listBrowserFrameClasses(index, data.frames.length)]},
-            ['td.right', formatInteger(++currentBrowserIndex)],
-            ['td', item.browser],
-            ['td', stringify(item.version)],
-            ['td.right', formatInteger(item.users)]
-          ])
-        )
+      data.frames.map((frame, index) =>
+        frame.browsers.map(item => [
+          'tr',
+          {className: ['browser-item', ...listBrowserFrameClasses(index, data.frames.length)]},
+          ['td.right', formatInteger(++currentBrowserIndex)],
+          ['td', item.browser],
+          ['td', stringify(item.version)],
+          ['td.right', formatInteger(item.users)]
+        ])
+      )
     ]
   ];
-  build(
-    ['section', ['details', ['summary', `The list of known browsers (${formatInteger(currentBrowserIndex)})`], table]],
-    root
-  );
+  return build([['p', `The list of known browsers (${formatInteger(currentBrowserIndex)}):`], table]);
 };
 
-const makeUnknownBrowserTable = (root, data) => {
+const makeUnknownBrowserTable = data => {
   let currentBrowserIndex = 0;
   const table = [
     'table.unknown-browser-list',
     ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th.right', 'Users']]],
     [
       'tbody',
-      ...Object.keys(data.stats.unknownBrowsers).map(name => [
+      Object.keys(data.stats.unknownBrowsers).map(name => [
         'tr.unknown-browser-item',
         ['td.right', formatInteger(++currentBrowserIndex)],
         ['td', name],
@@ -258,16 +248,10 @@ const makeUnknownBrowserTable = (root, data) => {
       ])
     ]
   ];
-  build(
-    [
-      'section',
-      ['details', ['summary', `The list of unknown browsers (${formatInteger(currentBrowserIndex)})`], table]
-    ],
-    root
-  );
+  return build([['p', `The list of unknown browsers (${formatInteger(currentBrowserIndex)}):`], table]);
 };
 
-const makeSelectedFeatures = (root, data) => {
+const makeSelectedFeatures = data => {
   if (!data.features) return;
 
   let currentBrowserIndex = 0;
@@ -276,7 +260,7 @@ const makeSelectedFeatures = (root, data) => {
     ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th.right', 'Users']]],
     [
       'tbody',
-      ...Object.entries(unsupported).map(([name, value]) => [
+      Object.entries(unsupported).map(([name, value]) => [
         'tr.unknown-browser-item',
         ['td.right', formatInteger(++currentBrowserIndex)],
         ['td', name],
@@ -285,35 +269,50 @@ const makeSelectedFeatures = (root, data) => {
     ]
   ];
 
-  build(
-    [
-      'section',
-      Object.entries(data.features)
-        .map(([featureName, {users, unsupported}]) => {
-          const keys = Object.keys(unsupported);
-          return [
-            [
-              'h3',
-              ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName]}, featureName],
-              ': ' + data.featureTitles[featureName]
-            ],
-            [
-              'p',
-              `This feature is supported by ${formatInteger(users)} users (${formatNumber(
-                (users / data.stats.adjustedTotalUsers) * 100,
-                {decimals: 2}
-              )}%).`
-            ],
-            [
-              'details',
-              ['summary', `The list of browsers that do not support this feature (${formatInteger(keys.length)})`],
-              table(unsupported)
-            ]
-          ];
-        })
-    ],
-    root
+  return build(
+    Object.entries(data.features).map(([featureName, {users, unsupported}]) => {
+      const keys = Object.keys(unsupported);
+      return [
+        [
+          'h3',
+          ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName]}, featureName],
+          ': ' + data.featureTitles[featureName]
+        ],
+        [
+          'p',
+          `This feature is supported by ${formatInteger(users)} users (${formatNumber(
+            (users / data.stats.adjustedTotalUsers) * 100,
+            {decimals: 2}
+          )}%).`
+        ],
+        [
+          'details',
+          ['summary', `The list of browsers that do not support this feature (${formatInteger(keys.length)})`],
+          table(unsupported)
+        ]
+      ];
+    })
   );
+};
+
+const buildTabs = tabs => {
+  const form = build(['form.tabs', {submit: event => event.preventDefault()}]);
+  let counter = 0;
+  for (const [name, dom] of Object.entries(tabs)) {
+    build(
+      [
+        [
+          'input.tab',
+          {type: 'radio', name: 'tabs', value: 'tab' + counter, $: {checked: !counter}, id: 'tab' + counter}
+        ],
+        ['label.tab', {for: 'tab' + counter}, name],
+        ['section.tab', dom]
+      ],
+      form
+    );
+    ++counter;
+  }
+  return form;
 };
 
 const makeError = root =>
@@ -343,18 +342,14 @@ const main = async () => {
   makeHeader(root, data);
   makeControls(root, data);
 
-  build(['h2', 'Features'], root);
-  makeList(root, data);
-  makeTable(root, data);
+  const tabs = buildTabs({
+    Features: build(['', makeList(data), makeTable(data)]),
+    Browsers: makeBrowserTable(data),
+    'Unknown browsers': makeUnknownBrowserTable(data),
+    'Selected features': makeSelectedFeatures(data)
+  });
 
-  build(['h2', 'Browsers'], root);
-  makeBrowserTable(root, data);
-
-  build(['h2', 'Unknown browsers'], root);
-  makeUnknownBrowserTable(root, data);
-
-  build(['h2', 'Selected features'], root);
-  makeSelectedFeatures(root, data);
+  root.appendChild(tabs);
 };
 
 document.addEventListener('DOMContentLoaded', main);
