@@ -38,7 +38,6 @@ const makeInput = (type, name, value, labelText, active) => [
 ];
 
 const makeRadioButton = (name, value, labelText, active) => makeInput('radio', name, value, labelText, active);
-const makeCheckbox = (name, value, labelText, active) => makeInput('checkbox', name, value, labelText, active);
 
 const formControl = event => {
   const target = event.target;
@@ -77,19 +76,6 @@ const formControl = event => {
       return;
     }
   }
-  if (target.type === 'checkbox') {
-    if (target.name === 'table') {
-      Array.from(roots).forEach(root => {
-        const section = root.closest('section');
-        if (!section) return;
-        if (root.tagName === 'TABLE') {
-          section.style.display = target.checked ? 'block' : 'none';
-        } else {
-          section.style.display = target.checked ? 'none' : 'block';
-        }
-      });
-    }
-  }
 };
 
 const makeControls = (root, data) => {
@@ -118,9 +104,7 @@ const makeControls = (root, data) => {
           ['legend', 'Show features'],
           makeRadioButton('visibility', 'both', 'show all features', true),
           makeRadioButton('visibility', 'available', 'available only'),
-          makeRadioButton('visibility', 'missing', 'missing only'),
-          ['span', {$: {innerHTML: '&nbsp;'}}],
-          makeCheckbox('table', 'yes', 'show as table')
+          makeRadioButton('visibility', 'missing', 'missing only')
         ]
       ]
     ],
@@ -169,7 +153,6 @@ const makeTable = data => {
   const featureFrames = calcFeatureFrames(data);
   return build([
     'section',
-    {style: {display: 'none'}},
     [
       'table.feature-list.frame0',
       ['thead', ['tr', ['th', 'Feature name'], ['th', 'Description']]],
@@ -343,7 +326,8 @@ const main = async () => {
   makeControls(root, data);
 
   const tabs = buildTabs({
-    Features: build(['', makeList(data), makeTable(data)]),
+    'Features (list)': makeList(data),
+    'Features (table)': makeTable(data),
     Browsers: makeBrowserTable(data),
     'Unknown browsers': makeUnknownBrowserTable(data),
     'Selected features': makeSelectedFeatures(data)
