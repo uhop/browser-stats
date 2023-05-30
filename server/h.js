@@ -264,7 +264,7 @@ export const build = (vdom, parent, options) => {
     // make a node
     if (typeof tag == 'string') {
       // tag
-      node = create(tag, null, doc, ns, options);
+      node = tag === '' ? doc.createDocumentFragment() : create(tag, null, doc, ns, options);
     } else if (tag && typeof tag.appendChild == 'function') {
       // node
       node = tag;
