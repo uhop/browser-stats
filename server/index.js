@@ -1,6 +1,16 @@
 import {formatInteger, formatNumber} from './formatters.js';
 import {build} from './h.js';
 
+const getClusterSize = cluster => Object.values(cluster).reduce((acc, values) => acc + values.length, 0);
+
+export const stringify = version =>
+  version.major +
+  (version.minor || version.patch || version.build ? '.' + version.minor : '') +
+  (version.patch || version.build ? '.' + version.patch : '') +
+  (version.build ? '.' + version.build : '') +
+  (version.prerelease ? '-' + prerelease : '') +
+  (version.buildMeta ? '+' + buildMeta : '');
+
 const makeHeader = (root, data) => {
   const totalUnknownBrowsers = Object.keys(data.stats.unknownBrowsers).length;
   build(
@@ -184,37 +194,70 @@ const listBrowserFrameClasses = (from, to) => {
   return results;
 };
 
-export const stringify = version =>
-  version.major +
-  '.' +
-  version.minor +
-  '.' +
-  version.patch +
-  (version.build ? '.' + version.build : '') +
-  (version.prerelease ? '-' + prerelease : '') +
-  (version.buildMeta ? '+' + buildMeta : '');
-
 const makeBrowserTable = data => {
   let currentBrowserIndex = 0;
   const table = [
     'table.browser-list.frame0',
-    ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Version'], ['th.right', 'Users']]],
+    ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Versions'], ['th.right', 'Users']]],
     [
       'tbody',
       data.frames.map((frame, index) =>
-        frame.browsers.map(item => [
-          'tr',
-          {className: ['browser-item', ...listBrowserFrameClasses(index, data.frames.length)]},
-          ['td.right', formatInteger(++currentBrowserIndex)],
-          ['td', item.browser],
-          ['td', stringify(item.version)],
-          ['td.right', formatInteger(item.users)]
-        ])
+        frame.browsers.map(item => {
+          const browsers = Object.keys(item.cluster);
+          return browsers.map((browser, browserIndex) =>
+            browserIndex
+              ? [
+                  'tr',
+                  {className: ['browser-item', ...listBrowserFrameClasses(index, data.frames.length)]},
+                  ['td', browser],
+                  ['td', item.cluster[browser].map(stringify).join(', ')]
+                ]
+              : [
+                  'tr',
+                  {className: ['browser-item', ...listBrowserFrameClasses(index, data.frames.length)]},
+                  ['td.right', {rowspan: browsers.length}, formatInteger(++currentBrowserIndex)],
+                  ['td', browser],
+                  ['td', item.cluster[browser].map(stringify).join(', ')],
+                  ['td.right', {rowspan: browsers.length}, formatInteger(item.users)]
+                ]
+          );
+        })
       )
     ]
   ];
   return build([['p', `The list of known browsers (${formatInteger(currentBrowserIndex)}):`], table]);
 };
+
+const makeClusterTable = (data, index) => {
+  const frame = data.frames[index];
+  let currentBrowserIndex = 0;
+  const table = [
+    'table.unknown-browser-list',
+    ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Versions']]],
+    [
+      'tbody',
+      Object.entries(frame.cluster).map(([browser, versions]) => [
+        'tr',
+        ['td.right', formatInteger(++currentBrowserIndex)],
+        ['td', browser],
+        ['td', versions.map(stringify).join(', ')]
+      ])
+    ]
+  ];
+  return build([
+    'section.frame-cluster.frame' + index,
+    [
+      'p',
+      `The following cluster of browsers (${formatInteger(getClusterSize(frame.cluster))}) covers ${formatInteger(
+        frame.users
+      )} (${formatNumber((frame.users / data.stats.adjustedTotalUsers) * 100, {decimals: 2})}%) users:`
+    ],
+    table
+  ]);
+};
+
+const makeClusterTables = data =>
+  build(['section.browser-list.frame0', ...data.frames.map((_, index) => makeClusterTable(data, index))]);
 
 const makeUnknownBrowserTable = data => {
   let currentBrowserIndex = 0;
@@ -234,48 +277,49 @@ const makeUnknownBrowserTable = data => {
   return build([['p', `The list of unknown browsers (${formatInteger(currentBrowserIndex)}):`], table]);
 };
 
-const makeSelectedFeatures = data => {
-  if (!data.features) return;
+const makeSelectedFeatures = (data, featureName, users, unsupported) => {
+  const table = unsupported => {
+    let currentBrowserIndex = 0;
+    return [
+      'table.unknown-browser-list',
+      ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Versions'], ['th.right', 'Users']]],
+      [
+        'tbody',
+        unsupported.map(({cluster, users}) => {
+          const browsers = Object.keys(cluster);
+          return browsers.map((browser, index) =>
+            index
+              ? ['tr.unknown-browser-item', ['td', browser], ['td', cluster[browser].map(stringify).join(', ')]]
+              : [
+                  'tr.unknown-browser-item',
+                  ['td.right', {rowspan: browsers.length}, formatInteger(++currentBrowserIndex)],
+                  ['td', browser],
+                  ['td', cluster[browser].map(stringify).join(', ')],
+                  ['td.right', {rowspan: browsers.length}, formatInteger(users)]
+                ]
+          );
+        })
+      ]
+    ];
+  };
 
-  let currentBrowserIndex = 0;
-  const table = unsupported => [
-    'table.unknown-browser-list',
-    ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th.right', 'Users']]],
+  return build([
+    '',
     [
-      'tbody',
-      Object.entries(unsupported).map(([name, value]) => [
-        'tr.unknown-browser-item',
-        ['td.right', formatInteger(++currentBrowserIndex)],
-        ['td', name],
-        ['td.right', formatInteger(value)]
-      ])
-    ]
-  ];
-
-  return build(
-    Object.entries(data.features).map(([featureName, {users, unsupported}]) => {
-      const keys = Object.keys(unsupported);
-      return [
-        [
-          'h3',
-          ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName]}, featureName],
-          ': ' + data.featureTitles[featureName]
-        ],
-        [
-          'p',
-          `This feature is supported by ${formatInteger(users)} users (${formatNumber(
-            (users / data.stats.adjustedTotalUsers) * 100,
-            {decimals: 2}
-          )}%).`
-        ],
-        [
-          'details',
-          ['summary', `The list of browsers that do not support this feature (${formatInteger(keys.length)})`],
-          table(unsupported)
-        ]
-      ];
-    })
-  );
+      'h3',
+      ['a', {href: 'https://caniuse.com/' + featureName, title: data.featureTitles[featureName]}, featureName],
+      ': ' + data.featureTitles[featureName]
+    ],
+    [
+      'p',
+      `This feature is supported by ${formatInteger(users)} (${formatNumber(
+        (users / data.stats.adjustedTotalUsers) * 100,
+        {decimals: 2}
+      )}%) users.`
+    ],
+    ['p', `The list of browser clusters that do not support this feature (${formatInteger(unsupported.length)}):`],
+    table(unsupported)
+  ]);
 };
 
 const buildTabs = tabs => {
@@ -325,15 +369,21 @@ const main = async () => {
   makeHeader(root, data);
   makeControls(root, data);
 
-  const tabs = buildTabs({
+  const tabs = {
     'Features (list)': makeList(data),
     'Features (table)': makeTable(data),
     Browsers: makeBrowserTable(data),
-    'Unknown browsers': makeUnknownBrowserTable(data),
-    'Selected features': makeSelectedFeatures(data)
-  });
+    Cluster: makeClusterTables(data),
+    'Unknown browsers': makeUnknownBrowserTable(data)
+  };
 
-  root.appendChild(tabs);
+  if (data.features) {
+    Object.entries(data.features).forEach(([featureName, {users, unsupported}]) => {
+      tabs['Feature: ' + featureName] = makeSelectedFeatures(data, featureName, users, unsupported);
+    });
+  }
+
+  root.appendChild(buildTabs(tabs));
 };
 
 document.addEventListener('DOMContentLoaded', main);

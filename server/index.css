@@ -401,6 +401,25 @@ table.unknown-browser-list tr.unknown-browser-item td {
   color: var(--app-link-color);
 }
 
+/* frame clusters */
+
+section.frame-cluster {
+  display: none;
+}
+
+section.browser-list.frame0 section.frame-cluster.frame0,
+section.browser-list.frame1 section.frame-cluster.frame1,
+section.browser-list.frame2 section.frame-cluster.frame2,
+section.browser-list.frame3 section.frame-cluster.frame3,
+section.browser-list.frame4 section.frame-cluster.frame4,
+section.browser-list.frame5 section.frame-cluster.frame5,
+section.browser-list.frame6 section.frame-cluster.frame6,
+section.browser-list.frame7 section.frame-cluster.frame7,
+section.browser-list.frame8 section.frame-cluster.frame8,
+section.browser-list.frame9 section.frame-cluster.frame9 {
+  display: block;
+}
+
 /* tabs */
 
 form.tabs {
