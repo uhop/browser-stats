@@ -24,7 +24,9 @@ const makeHeader = (root, data) => {
               data.stats.knownBrowsers + totalUnknownBrowsers
             )} distinct browsers &mdash; ${formatInteger(data.stats.knownBrowsers)} known and ${formatInteger(
               totalUnknownBrowsers
-            )} unknown browsers. After clustering we found ${formatInteger(data.stats.uniqueBrowsers)} unique browsers.`
+            )} unknown browsers. After clustering we found ${formatInteger(
+              data.stats.uniqueBrowsers
+            )} unique browsers organized in ${formatInteger(data.stats.uniqueBrowserClusters)} feature clusters.`
           }
         }
       ],
@@ -195,7 +197,8 @@ const listBrowserFrameClasses = (from, to) => {
 };
 
 const makeBrowserTable = data => {
-  let currentBrowserIndex = 0;
+  let currentBrowserIndex = 0,
+    totalBrowsers = 0;
   const table = [
     'table.browser-list.frame0',
     ['thead', ['tr', ['th.right', '#'], ['th', 'Browser'], ['th', 'Versions'], ['th.right', 'Users']]],
@@ -204,6 +207,7 @@ const makeBrowserTable = data => {
       data.frames.map((frame, index) =>
         frame.browsers.map(item => {
           const browsers = Object.keys(item.cluster);
+          totalBrowsers += getClusterSize(item.cluster);
           return browsers.map((browser, browserIndex) =>
             browserIndex
               ? [
@@ -225,7 +229,7 @@ const makeBrowserTable = data => {
       )
     ]
   ];
-  return build([['p', `The list of known browsers (${formatInteger(currentBrowserIndex)}):`], table]);
+  return build([['p', `The list of known browsers (${formatInteger(totalBrowsers)}):`], table]);
 };
 
 const makeClusterTable = (data, index) => {
@@ -248,7 +252,7 @@ const makeClusterTable = (data, index) => {
     'section.frame-cluster.frame' + index,
     [
       'p',
-      `The following cluster of browsers (${formatInteger(getClusterSize(frame.cluster))}) covers ${formatInteger(
+      `The following browsers (${formatInteger(getClusterSize(frame.cluster))}) covers ${formatInteger(
         frame.users
       )} (${formatNumber((frame.users / data.stats.adjustedTotalUsers) * 100, {decimals: 2})}%) users:`
     ],
@@ -373,7 +377,7 @@ const main = async () => {
     'Features (list)': makeList(data),
     'Features (table)': makeTable(data),
     Browsers: makeBrowserTable(data),
-    Cluster: makeClusterTables(data),
+    Compact: makeClusterTables(data),
     'Unknown browsers': makeUnknownBrowserTable(data)
   };
 

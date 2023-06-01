@@ -125,6 +125,7 @@ const main = () =>
 
     console.log('\nStarting clustering browsers by features...');
     const browserClusters = clusterFeatures(browsers);
+    globalResults.stats.uniqueBrowserClusters = browserClusters.length;
     console.log('Unique browser clusters: ', browserClusters.length);
 
     let previousFeatures = null,
