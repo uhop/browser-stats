@@ -37,8 +37,8 @@ export const collectFeatures = (browser, version, features = getAllFeatures()) =
 
 export const getAllFeatureTitles = () => {
   const result = {};
-  for (const name of Object.keys(lite.features)) {
-    result[name] = lite.feature(lite.features[name]).title;
+  for (const [name, value] of Object.entries(lite.features)) {
+    result[name] = lite.feature(value).title;
   }
   return result;
 };
@@ -47,6 +47,8 @@ export const hasFeatureByName = (browser, version, featureName) => {
   if (typeof version == 'string') {
     version = parse(version);
   }
-  const feature = lite.feature(lite.features[featureName]);
+  const value = lite.features[featureName];
+  if (!value) return false;
+  const feature = lite.feature(value);
   return hasFeature(browser, version, feature);
 };
