@@ -9,9 +9,12 @@ import takeWhile from 'stream-chain/utils/takeWhile.js';
 import removeRows from './removeRows.js';
 import asObjects from './asObjects.js';
 import {known, translate} from './browsers.js';
-import {difference} from './set-ops.js';
-import {collectFeatures, getAllFeatures, getAllFeatureTitles, hasFeatureByName} from './features.js';
-import {compare, stringify} from './version.js';
+import {difference, intersectionInPlace} from './set-ops.js';
+import {getAllFeatureTitles, hasFeatureByName} from './features.js';
+
+import BrowserCluster from './clusters.js';
+import clusterVersions from './cluster-versions.js';
+import clusterFeatures from './cluster-features.js';
 
 const REPORT_PERCENTAGE = [0.95, 0.97, 0.99, 0.995, 0.997, 0.999];
 const REPORT_FEATURES = ['es5', 'es6'];
@@ -95,44 +98,6 @@ const getStats = () =>
     );
   });
 
-const clusterVersions = (browsers, clusterLevel) => {
-  // delete unnecessary version parts
-  if (clusterLevel === 'major') {
-    browsers.forEach(item => {
-      item.version.minor = item.version.patch = item.version.build = 0;
-      delete item.version.prerelease;
-      delete item.version.buildMeta;
-    });
-  } else if (clusterLevel === 'minor') {
-    browsers.forEach(item => {
-      item.version.patch = item.version.build = 0;
-      delete item.version.prerelease;
-      delete item.version.buildMeta;
-    });
-  }
-
-  // sort by versions
-  browsers.sort(
-    (a, b) => (a.browser < b.browser ? -1 : b.browser < a.browser ? 1 : 0) || compare(a.version, b.version)
-  );
-
-  // cluster by versions
-  const clusteredBrowsers = [];
-  while (browsers.length) {
-    const current = browsers.pop();
-    while (browsers.length) {
-      const top = browsers[browsers.length - 1];
-      if (current.browser !== top.browser || compare(current.version, top.version)) break;
-      current.users += top.users;
-      browsers.pop();
-    }
-    clusteredBrowsers.push(current);
-  }
-
-  // descending sort by users
-  return clusteredBrowsers.sort((a, b) => b.users - a.users);
-};
-
 const main = () =>
   new Promise(async (resolve, reject) => {
     const stats = await getStats().catch(error => (reject(error), Promise.reject(error))),
@@ -158,33 +123,45 @@ const main = () =>
     globalResults.stats.uniqueBrowsers = browsers.length;
     console.log('Unique browsers: ', browsers.length);
 
+    console.log('\nStarting clustering browsers by features...');
+    const browserClusters = clusterFeatures(browsers);
+    console.log('Unique browser clusters: ', browserClusters.length);
+
     let previousFeatures = null,
-      currentFeatures = getAllFeatures(),
+      currentFeatures = null,
       currentUsers = 0,
       currentBrowsers = [];
 
-    browsers.forEach(({browser, version, users}) => {
-      currentFeatures = collectFeatures(browser, version, currentFeatures);
+    browserClusters.forEach(item => {
+      const {browser, version, users, features, cluster} = item;
+
+      if (currentFeatures) {
+        intersectionInPlace(currentFeatures, features);
+      } else {
+        currentFeatures = new Set(features);
+      }
 
       REPORT_FEATURES.forEach(name => {
         let feature = globalResults.features[name];
         if (!feature) {
-          feature = globalResults.features[name] = {users: 0, unsupported: {}};
+          feature = globalResults.features[name] = {users: 0, unsupported: []};
         }
         if (hasFeatureByName(browser, version, name)) {
           feature.users += users;
         } else {
-          feature.unsupported[browser + ' ' + stringify(version)] = users;
+          feature.unsupported.push({browser, version, users, cluster});
         }
       });
 
-      currentBrowsers.push({browser, version, users});
+      currentBrowsers.push({browser, version, users, cluster});
       currentUsers += users;
 
       for (const ratio = currentUsers / adjustedTotalUsers; ratio >= percentage[0]; percentage.shift()) {
         console.log('\nPERCENTAGE:', (percentage[0] * 100).toFixed(2));
 
         const frame = {users: currentUsers, browsers: currentBrowsers};
+
+        // feature arithmetics
         if (previousFeatures) {
           const removedFeatures = difference(previousFeatures, currentFeatures);
           removedFeatures.size && console.log('REMOVED:', Array.from(removedFeatures).join(', '));
@@ -199,6 +176,16 @@ const main = () =>
 
           frame.available = Array.from(currentFeatures);
         }
+
+        // create a frame cluster
+        const frameCluster = new BrowserCluster();
+        if (globalResults.frames.length) {
+          frameCluster.addCluster(globalResults.frames[globalResults.frames.length - 1].cluster);
+        }
+        currentBrowsers.forEach(({cluster}) => frameCluster.addCluster(cluster));
+        frameCluster.normalize();
+        frame.cluster = frameCluster.cluster;
+
         globalResults.frames.push(frame);
 
         currentBrowsers = [];
@@ -219,6 +206,8 @@ const main = () =>
     }
 
     fs.writeFileSync(outputFileName, JSON.stringify(globalResults, null, 2));
+
+    resolve(true);
   });
 main().then(
   () => console.log('DONE.'),
